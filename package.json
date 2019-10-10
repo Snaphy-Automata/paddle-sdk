@@ -1,12 +1,12 @@
 {
-  "name": "paddle-sdk",
+  "name": "snaphy-paddle",
   "description": "The Paddle.com Node.js SDK",
   "version": "1.2.2",
   "main": "sdk.js",
-  "author": "Valentin Agachi <github-com@agachi.name>",
+  "author": "Robins Gupta <robins@snaphy.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/avaly/paddle-sdk"
+    "url": "https://github.com/Snaphy-Automata/paddle-sdk.git"
   },
   "license": "MIT",
   "keywords": [
