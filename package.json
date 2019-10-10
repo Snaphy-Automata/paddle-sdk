@@ -1,7 +1,7 @@
 {
   "name": "snaphy-paddle",
   "description": "The Paddle.com Node.js SDK",
-  "version": "1.2.2",
+  "version": "1.0.1",
   "main": "sdk.js",
   "author": "Robins Gupta <robins@snaphy.com>",
   "repository": {
