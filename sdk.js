@@ -5,6 +5,7 @@ const pkg = require('./package.json');
 const serialize = require('./lib/serialize');
 
 const SERVER_URL = 'https://vendors.paddle.com/api/2.0';
+const CHECKOUT_URL = 'https://vendors.paddle.com/api/2.0';
 
 class PaddleSDK {
 	/**
@@ -38,8 +39,11 @@ class PaddleSDK {
 	 * @param {boolean} [options.form] - form parameter (ref: got package)
 	 * @param {boolean} [options.json] - json parameter (ref: got package)
 	 */
-	_request(path, { body = {}, headers = {}, form = true, json = false } = {}) {
-		const url = this.server + path;
+	_request(path, { body = {}, headers = {}, form = true, json = false } = {}, urlType) {
+		let url = this.server + path;
+		if(urlType === "transactions"){
+			url = CHECKOUT_URL + path;
+		}
 		const fullBody = Object.assign(body, this._getDefaultBody());
 
 		const options = {
@@ -197,7 +201,7 @@ class PaddleSDK {
 	 * @fulfil {object} - The transations list
 	 */
 	_getTransactions(type, id) {
-		return this._request(`/${type}/${id}/transactions`);
+		return this._request(`/${type}/${id}/transactions`, undefined, 'transactions');
 	}
 
 	/**
