@@ -20,7 +20,9 @@ Welcome to the [Paddle.com](http://www.paddle.com/) Node.js SDK documentation.
     * [.getOrderTransactions(orderID)](#PaddleSDK+getOrderTransactions) ⇒ <code>Promise</code>
     * [.getCheckoutTransactions(checkoutID)](#PaddleSDK+getCheckoutTransactions) ⇒ <code>Promise</code>
     * [.verifyWebhookData(postData)](#PaddleSDK+verifyWebhookData) ⇒ <code>boolean</code>
+    * [.updateSubscriptionPlan(subscriptionID, planID, prorate)](#PaddleSDK+updateSubscriptionPlan) ⇒ <code>Promise</code>
     * [.cancelSubscription(subscriptionID)](#PaddleSDK+cancelSubscription) ⇒ <code>Promise</code>
+    * [.generatePayLink(body)](#PaddleSDK+generatePayLink) ⇒ <code>Promise</code>
 
 <a name="new_PaddleSDK_new"></a>
 
@@ -210,6 +212,24 @@ const client = new PaddleSDK('your-vendor-id', 'your-unique-api-key', 'your-publ
 // inside an Express handler which uses express.bodyParser middleware
 const isVerified = client.verifyWebhookData(req.body);
 ```
+<a name="PaddleSDK+updateSubscriptionPlan"></a>
+
+### client.updateSubscriptionPlan(subscriptionID, planID, prorate) ⇒ <code>Promise</code>
+Update (upgrade/downgrade) the plan of a subscription
+
+**Kind**: instance method of [<code>PaddleSDK</code>](#PaddleSDK)  
+**Fulfill**: <code>object</code> - The result of the operation  
+
+| Param | Type | Default |
+| --- | --- | --- |
+| subscriptionID | <code>number</code> |  | 
+| planID | <code>number</code> |  | 
+| prorate | <code>boolean</code> | <code>false</code> | 
+
+**Example**  
+```js
+const result = await client.updateSubscriptionPlan(123);
+```
 <a name="PaddleSDK+cancelSubscription"></a>
 
 ### client.cancelSubscription(subscriptionID) ⇒ <code>Promise</code>
@@ -226,6 +246,33 @@ Cancels an active subscription
 ```js
 const result = await client.cancelSubscription(123);
 ```
+<a name="PaddleSDK+generatePayLink"></a>
+
+### client.generatePayLink(body) ⇒ <code>Promise</code>
+Generate a custom pay link
+
+**Kind**: instance method of [<code>PaddleSDK</code>](#PaddleSDK)  
+**Fulfil**: <code>object</code> - The new pay link url  
+
+| Param | Type |
+| --- | --- |
+| body | <code>object</code> | 
+
+**Example**  
+```js
+const custom = await client.generatePayLink({
+ "title" : "my custom checkout",
+ "custom_message" : "some custom message"
+	"prices": [
+		"USD:19.99",
+		"EUR:15.99"
+	 ]
+	});
+```
 ---
 
+<<<<<<< HEAD
 Documentation generated on **Thu, 10 Oct 2019 06:11:32 GMT**
+=======
+Documentation generated on **Tue, 12 May 2020 09:35:32 GMT**
+>>>>>>> 67415f1a8957fb46e6f51aa55a473040e8d310ba

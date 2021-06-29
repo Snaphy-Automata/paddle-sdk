@@ -91,8 +91,8 @@ describe('subscription methods', () => {
 				.post(path, expectedBody)
 				.reply(400, DEFAULT_ERROR);
 
-			return instance.getProductPlans(PRODUCT_ID).catch(response => {
-				expect(response.statusCode).toBe(400);
+			return instance.getProductPlans(PRODUCT_ID).catch(err => {
+				expect(err.response.statusCode).toBe(400);
 				expect(scope.isDone()).toBeTruthy();
 			});
 		});
@@ -148,8 +148,8 @@ describe('subscription methods', () => {
 				.post(path, expectedBody)
 				.reply(400, DEFAULT_ERROR);
 
-			return instance.getPlanUsers(PLAN_ID).catch(response => {
-				expect(response.statusCode).toBe(400);
+			return instance.getPlanUsers(PLAN_ID).catch(err => {
+				expect(err.response.statusCode).toBe(400);
 				expect(scope.isDone()).toBeTruthy();
 			});
 		});
@@ -197,10 +197,53 @@ describe('subscription methods', () => {
 				.post(path, expectedBody)
 				.reply(400, DEFAULT_ERROR);
 
-			return instance.getPlanPayments(PLAN_ID).catch(response => {
-				expect(response.statusCode).toBe(400);
+			return instance.getPlanPayments(PLAN_ID).catch(err => {
+				expect(err.response.statusCode).toBe(400);
 				expect(scope.isDone()).toBeTruthy();
 			});
+		});
+	});
+
+	describe('updateSubscription', () => {
+		const path = '/subscription/users/update';
+		const expectedBody = Object.assign(
+			{
+				subscription_id: SUBSCRIPTION_ID,
+				plan_id: PLAN_ID,
+				prorate: false,
+			},
+			EXPECTED_BODY
+		);
+
+		it('resolves on successfull request', () => {
+			// https://developer.paddle.com/api-reference/subscription-api/subscription-users/updateuser
+			const body = {
+				success: true,
+			};
+
+			const scope = nock()
+				.post(path, expectedBody)
+				.reply(200, body);
+
+			return instance
+				.updateSubscriptionPlan(SUBSCRIPTION_ID, PLAN_ID)
+				.then(response => {
+					expect(response).toEqual(body);
+					expect(scope.isDone()).toBeTruthy();
+				});
+		});
+
+		it('rejects on error request', () => {
+			const scope = nock()
+				.post(path, expectedBody)
+				.reply(400, DEFAULT_ERROR);
+
+			return instance
+				.updateSubscriptionPlan(SUBSCRIPTION_ID, PLAN_ID)
+				.catch(err => {
+					expect(err.response.statusCode).toBe(400);
+					expect(scope.isDone()).toBeTruthy();
+				});
 		});
 	});
 
@@ -234,8 +277,8 @@ describe('subscription methods', () => {
 				.post(path, expectedBody)
 				.reply(400, DEFAULT_ERROR);
 
-			return instance.cancelSubscription(SUBSCRIPTION_ID).catch(response => {
-				expect(response.statusCode).toBe(400);
+			return instance.cancelSubscription(SUBSCRIPTION_ID).catch(err => {
+				expect(err.response.statusCode).toBe(400);
 				expect(scope.isDone()).toBeTruthy();
 			});
 		});

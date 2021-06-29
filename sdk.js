@@ -32,35 +32,43 @@ class PaddleSDK {
 	 *
 	 * @private
 	 * @param {string} url - url to do request
-	 * @param {object} body - body parameters / object
-	 * @param {object} [headers] - header parameters
+	 * @param {object} options
+	 * @param {object} [options.body] - body parameters / object
+	 * @param {object} [options.headers] - header parameters
+	 * @param {boolean} [options.form] - form parameter (ref: got package)
+	 * @param {boolean} [options.json] - json parameter (ref: got package)
 	 */
-	_request(path, body = {}, headers = this._getDefaultHeaders()) {
+	_request(path, { body = {}, headers = {}, form = true, json = false } = {}) {
 		const url = this.server + path;
+		const fullBody = Object.assign(body, this._getDefaultBody());
 
 		const options = {
-			body: Object.assign(body, this._getDefaultBody()),
-			form: true,
-			headers,
-			json: true,
+			headers: this._getDefaultHeaders(headers),
 			method: 'POST',
 		};
+		if (form) {
+			options.form = fullBody;
+		}
+		if (json) {
+			options.json = fullBody;
+		}
+		// console.log('options', options);
 
-		return got(url, options).then(response => {
-			const { body } = response;
+		return got(url, options)
+			.json()
+			.then(body => {
+				if (typeof body.success === 'boolean') {
+					if (body.success) {
+						return body.response || body;
+					}
 
-			if (typeof body.success === 'boolean') {
-				if (body.success) {
-					return body.response || body;
+					throw new Error(
+						`Request ${url} returned an error! response=${JSON.stringify(body)}`
+					);
 				}
 
-				throw new Error(
-					`Request ${url} returned an error! response=${JSON.stringify(body)}`
-				);
-			}
-
-			return body;
-		});
+				return body;
+			});
 	}
 
 	_getDefaultBody() {
@@ -111,7 +119,9 @@ class PaddleSDK {
 	 * const coupons = await client.getProductCoupons(123);
 	 */
 	getProductCoupons(productID) {
-		return this._request('/product/list_coupons', { product_id: productID });
+		return this._request('/product/list_coupons', {
+			body: { product_id: productID },
+		});
 	}
 
 	/**
@@ -126,7 +136,9 @@ class PaddleSDK {
 	 * const plans = await client.getProductPlans(123);
 	 */
 	getProductPlans(productID) {
-		return this._request('/subscription/plans', { product_id: productID });
+		return this._request('/subscription/plans', {
+			body: { product_id: productID },
+		});
 	}
 
 	/**
@@ -141,7 +153,9 @@ class PaddleSDK {
 	 * const users = await client.getPlanUsers(123);
 	 */
 	getPlanUsers(planID) {
-		return this._request('/subscription/users', { plan: planID });
+		return this._request('/subscription/users', {
+			body: { plan: planID },
+		});
 	}
 
 	/**
@@ -156,7 +170,9 @@ class PaddleSDK {
 	 * const payments = await client.getPlanPayments(123);
 	 */
 	getPlanPayments(planID) {
-		return this._request('/subscription/payments', { plan: planID });
+		return this._request('/subscription/payments', {
+			body: { plan: planID },
+		});
 	}
 
 	/**
@@ -286,6 +302,29 @@ class PaddleSDK {
 	}
 
 	/**
+	 * Update (upgrade/downgrade) the plan of a subscription
+	 *
+	 * @method
+	 * @param {number} subscriptionID
+	 * @param {number} planID
+	 * @param {boolean} prorate
+	 * @returns {Promise}
+	 * @fulfill {object} - The result of the operation
+	 *
+	 * @example
+	 * const result = await client.updateSubscriptionPlan(123);
+	 */
+	updateSubscriptionPlan(subscriptionID, planID, prorate = false) {
+		return this._request('/subscription/users/update', {
+			body: {
+				subscription_id: subscriptionID,
+				plan_id: planID,
+				prorate,
+			},
+		});
+	}
+
+	/**
 	 * Cancels an active subscription
 	 *
 	 * @method
@@ -298,7 +337,33 @@ class PaddleSDK {
 	 */
 	cancelSubscription(subscriptionID) {
 		return this._request('/subscription/users_cancel', {
-			subscription_id: subscriptionID,
+			body: { subscription_id: subscriptionID },
+		});
+	}
+
+	/**
+	 * Generate a custom pay link
+	 *
+	 * @method
+	 * @param {object} body
+	 * @returns {Promise}
+	 * @fulfil {object} - The new pay link url
+	 *
+	 * @example
+	 * const custom = await client.generatePayLink({
+	 *  "title" : "my custom checkout",
+	 *  "custom_message" : "some custom message"
+	 * 	"prices": [
+	 *		"USD:19.99",
+	 *		"EUR:15.99"
+	 *	 ]
+	 *	});
+	 */
+	generatePayLink(body) {
+		return this._request('/product/generate_pay_link', {
+			body,
+			form: false,
+			json: true,
 		});
 	}
 }
